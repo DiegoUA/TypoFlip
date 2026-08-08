@@ -53,8 +53,6 @@ jobs:
         env:
           ACCEPT_BUILD_END_USER_AGREEMENT: "1"
         run: |
-          # Clean old artifacts and run debug build
-          buildozer android clean
           buildozer -v android debug
 
       - name: Upload APK Artifact
