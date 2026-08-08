@@ -27,16 +27,22 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev zip unzip zlib1g-dev
+          sudo apt-get install -y build-essential ccache git libffi-dev libssl-dev python3-dev zip unzip zlib1g-dev libltdl-dev
 
       - name: Install Buildozer & Cython
         run: |
           pip install --upgrade pip
           pip install "cython<3.0.0" buildozer
 
+      - name: Pre-accept Buildozer SDK Licenses
+        run: |
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n24333f8a637b3702d100917d1b70d02d7e447b27\n89330d3222ba18835344ec370da06c6d6d7c7735\n7a1154465077921a48c9735d465377f0f6706e57\n84831b9409646a918e30573bab4c9c91346d8abd\nd975fa133f7212b567b1e2a9b242e207470752f9\n27447344fe9a9c6e0a4703819a5b38068a75697b" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
+
       - name: Build APK with Buildozer
         run: |
-          buildozer android debug
+          yes | buildozer android debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4

@@ -46,3 +46,9 @@ android.api = 33
 
 # (int) Minimum API supported
 android.minapi = 21
+
+# (str) Android NDK version to use
+android.ndk = 25b
+
+# (str) Build Tools version to use
+android.build_tools_version = 33.0.2
