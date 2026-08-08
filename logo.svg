@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+    <!-- Deep Charcoal Rounded Background -->
+    <rect width="512" height="512" rx="64" fill="#2D2D2D"/>
+    
+    <!-- Stylized Conversion Arrow (Flip) -->
+    <path d="M 400 120 L 400 280 C 400 350, 350 400, 280 400 L 120 400" stroke="#FF5722" stroke-width="40" fill="none" stroke-linecap="round"/>
+    <polygon points="120,400 160,360 160,440" fill="#FF5722"/>
+
+    <!-- Large, Bold 'T' (Typo) -->
+    <text x="140" y="320" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="280" fill="#FFFFFF">T</text>
+</svg>
