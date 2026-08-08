@@ -44,9 +44,17 @@ jobs:
             cmake \
             lld
 
-      - name: Install Buildozer & Cython
+      - name: Cache Buildozer global directory
+        uses: actions/cache@v4
+        with:
+          path: ~/.buildozer
+          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+          restore-keys: |
+            ${{ runner.os }}-buildozer-
+
+      - name: Install Buildozer & dependencies
         run: |
-          python -m pip install --upgrade pip setuptools
+          python -m pip install --upgrade "pip<25.0" setuptools
           python -m pip install "cython<3.0.0" buildozer
 
       - name: Build with Buildozer
