@@ -6,6 +6,12 @@ title = TypoFlip
 # (str) Icon of the application
 icon.filename = %(source.dir)s/logo.png
 
+# (str) Presplash of the application (the image shown during app loading)
+presplash.filename = %(source.dir)s/logo.png
+
+# (str) Presplash background color (for Android)
+presplash.color = #1E1E1E
+
 # (str) Package name (lower case, single word recommended)
 package.name = typoflip
 
