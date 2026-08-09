@@ -58,6 +58,9 @@ android.enable_androidx = True
 # (list) List of Android architectures to build for
 android.archs = arm64-v8a
 
+# (str) Format to use where packaging the application for release (apk or aab)
+android.release_artifact = apk
+
 #
 # Python-for-Android (p4a) specific settings
 #
