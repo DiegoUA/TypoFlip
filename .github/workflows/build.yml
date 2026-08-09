@@ -28,21 +28,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential \
-            ccache \
-            git \
-            libffi-dev \
-            libssl-dev \
-            python3-dev \
-            zip \
-            unzip \
-            zlib1g-dev \
-            libltdl-dev \
-            autoconf \
-            libtool \
-            pkg-config \
-            cmake \
-            lld
+            build-essential ccache git libffi-dev libssl-dev \
+            python3-dev zip unzip zlib1g-dev libltdl-dev \
+            autoconf libtool pkg-config cmake lld
+
+      - name: Restore Keystore File
+        run: |
+          mkdir -p ~/.keystores
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ~/.keystores/typoflip-release.keystore
 
       - name: Cache Buildozer global directory
         uses: actions/cache@v4
@@ -57,15 +50,19 @@ jobs:
           python -m pip install --upgrade "pip<25.0" setuptools
           python -m pip install "cython<3.0.0" buildozer
 
-      - name: Build with Buildozer
+      - name: Build Release APK with Buildozer
         env:
           ACCEPT_BUILD_END_USER_AGREEMENT: "1"
+          P4A_RELEASE_KEYSTORE: /home/runner/.keystores/typoflip-release.keystore
+          P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.KEYSTORE_PASSWORD }}
+          P4A_RELEASE_KEYALIAS: ${{ secrets.KEY_ALIAS }}
+          P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          buildozer -v android debug
+          buildozer -v android release
 
       - name: Upload APK Artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TypoFlip-APK-API36
-          path: bin/*.apk
+          name: TypoFlip-Release-APK
+          path: bin/*-release-*.apk
