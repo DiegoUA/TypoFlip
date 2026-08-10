@@ -62,7 +62,7 @@ class TypoFlipApp(App):
             Clock.schedule_once(self.reset_copy_button, 3)
 
     def reset_copy_button(self, dt):
-    self.copy_btn.text = "Copy"
+        self.copy_btn.text = "Copy to Clipboard"
 
 if __name__ == '__main__':
     TypoFlipApp().run()

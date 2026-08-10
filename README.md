@@ -9,19 +9,21 @@ Privacy-first, open-source layout converter, password generator, and multi-scrip
 - 🔒 **Privacy First**: Processed 100% locally on-device with zero network communication.
 
 ## Architecture
-```text
 TypoFlip/
 ├── .github/
 │   └── workflows/
-│       └── build.yml          # Automated release workflow
+│       └── build.yml          # Automated GitHub Actions build pipeline
 ├── assets/
-│   ├── generate_assets.py     # Local SVG -> PNG converter (PyMuPDF)
-│   ├── logo.svg               # Vector app logo
-│   ├── logo.png               # Rendered app icon & splash asset
-│   ├── feature_graphic.svg    # Store feature banner source
+│   ├── clipboard.png          # Rendered copy checkmark icon for Kivy UI
+│   ├── clipboard.svg          # Clipboard vector source
 │   ├── feature_graphic.png    # Store feature banner graphic
-│   ├── clipboard.svg          # Clipboard success icon vector
-│   └── clipboard.png          # Rendered clipboard icon for Kivy UI
-├── buildozer.spec             # Android build & packaging configuration
-├── main.py                    # Main Application logic & Kivy UI
+│   ├── feature_graphic.svg    # Store feature banner vector source
+│   ├── generate_assets.py     # Local SVG -> PNG asset renderer (PyMuPDF & Pillow)
+│   ├── logo.png               # Primary app icon
+│   ├── logo.svg               # Vector app logo source
+│   └── presplash.png          # Centered rounded logo for Android splash screen
+├── engines/
+│   └── layout_converter.py    # Core Ukrainian/English layout conversion engine
+├── buildozer.spec             # Android packaging & build configuration
+├── main.py                    # Main Application entry point & Kivy UI
 └── README.md
