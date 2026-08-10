@@ -3,6 +3,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.core.clipboard import Clipboard
+from kivy.clock import Clock
 
 from engines.layout_converter import LayoutConverterEngine
 
@@ -30,6 +31,7 @@ class TypoFlipApp(App):
         # Copy button
         self.copy_btn = Button(
             text="Copy to Clipboard",
+            markup=True,  # Enables Kivy BBCode-style color tags
             size_hint_y=0.2
         )
         self.copy_btn.bind(on_press=self.copy_to_clipboard)
@@ -53,7 +55,14 @@ class TypoFlipApp(App):
         """Copies output text to system clipboard."""
         if self.output_field.text:
             Clipboard.copy(self.output_field.text)
-            self.copy_btn.text = "Copied! ✓"
+            # Kivy button text logic on copy
+            self.copy_btn.markup = True
+            self.copy_btn.text = "Copied! [size=20sp][image=assets/clipboard.png][/size]"
+            # Reset button text back after 3 seconds
+            Clock.schedule_once(self.reset_copy_button, 3)
+
+    def reset_copy_button(self, dt):
+    self.copy_btn.text = "Copy"
 
 if __name__ == '__main__':
     TypoFlipApp().run()
