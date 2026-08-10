@@ -9,6 +9,7 @@ Privacy-first, open-source layout converter, password generator, and multi-scrip
 - 🔒 **Privacy First**: Processed 100% locally on-device with zero network communication.
 
 ## Architecture
+```text
 TypoFlip/
 ├── .github/
 │   └── workflows/
