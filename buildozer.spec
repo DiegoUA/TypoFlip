@@ -61,6 +61,9 @@ android.archs = arm64-v8a
 # (str) Format to use where packaging the application for release (apk or aab)
 android.release_artifact = apk
 
+# (str) Softinput mode for Android (adjustResize allows layout to shrink above keyboard)
+android.window_soft_input_mode = adjustResize
+
 #
 # Python-for-Android (p4a) specific settings
 #
