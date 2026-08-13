@@ -151,28 +151,42 @@ class MaterialButton(Button):
         super().__init__(**kwargs)
         self.background_normal = ''
         self.background_down = ''
+        self.background_color = (0, 0, 0, 0)
         self.border = (0, 0, 0, 0)
         self.text_size = self.size
         self.halign = 'center'
         self.valign = 'middle'
+        self._shadow_color = None
+        self._shadow_rect = None
+        self._fill_color = None
+        self._fill_rect = None
         self.bind(size=self._update_canvas, pos=self._update_canvas)
         self._update_canvas()
 
     def _update_canvas(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(*MaterialTheme.shadow())
-            RoundedRectangle(
-                size=(self.width, self.height),
-                pos=(self.x, self.y - dp(2)),
-                radius=[MaterialTheme.button_radius()],
-            )
-            Color(*self.theme_color)
-            RoundedRectangle(
-                size=self.size,
-                pos=self.pos,
-                radius=[MaterialTheme.button_radius()],
-            )
+        if self._shadow_color is None:
+            with self.canvas.before:
+                self._shadow_color = Color(*MaterialTheme.shadow())
+                self._shadow_rect = RoundedRectangle(
+                    size=(self.width, self.height),
+                    pos=(self.x, self.y - dp(2)),
+                    radius=[MaterialTheme.button_radius()],
+                )
+                self._fill_color = Color(*self.theme_color)
+                self._fill_rect = RoundedRectangle(
+                    size=self.size,
+                    pos=self.pos,
+                    radius=[MaterialTheme.button_radius()],
+                )
+        else:
+            self._shadow_color.rgba = MaterialTheme.shadow()
+            self._shadow_rect.size = (self.width, self.height)
+            self._shadow_rect.pos = (self.x, self.y - dp(2))
+            self._fill_color.rgba = self.theme_color
+            self._fill_rect.size = self.size
+            self._fill_rect.pos = self.pos
+            self._fill_rect.radius = [MaterialTheme.button_radius()]
+            self._shadow_rect.radius = [MaterialTheme.button_radius()]
         self.color = MaterialTheme.text_on_surface()
 
 
@@ -180,17 +194,25 @@ class MaterialTextInput(TextInput):
     def __init__(self, fill_color=None, **kwargs):
         self.fill_color = fill_color or MaterialTheme.surface()
         super().__init__(**kwargs)
+        self.background_color = (0, 0, 0, 0)
         self.border = (0, 0, 0, 0)
         self.padding = MaterialTheme.field_padding()
+        self._fill_color = None
+        self._fill_rect = None
         self.bind(size=self._update_canvas, pos=self._update_canvas)
         self._update_canvas()
 
     def _update_canvas(self, *args):
-        self.canvas.before.clear()
-        with self.canvas.before:
-            Color(*self.fill_color)
-            RoundedRectangle(
-                size=self.size,
-                pos=self.pos,
-                radius=[MaterialTheme.field_radius()],
-            )
+        if self._fill_color is None:
+            with self.canvas.before:
+                self._fill_color = Color(*self.fill_color)
+                self._fill_rect = RoundedRectangle(
+                    size=self.size,
+                    pos=self.pos,
+                    radius=[MaterialTheme.field_radius()],
+                )
+        else:
+            self._fill_color.rgba = self.fill_color
+            self._fill_rect.size = self.size
+            self._fill_rect.pos = self.pos
+            self._fill_rect.radius = [MaterialTheme.field_radius()]

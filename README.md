@@ -66,6 +66,8 @@ Generate the project PNG assets used by Android packaging:
 python assets/generate_assets.py
 ```
 
+If the app appears blank, the icon shows a white background, or the Android asset pipeline looks stale, regenerate the icon set and rebuild the APK from the updated source. This repo now uses transparent foreground assets plus a dedicated background layer for adaptive icons.
+
 Example of converting text via the engine:
 
 ```python

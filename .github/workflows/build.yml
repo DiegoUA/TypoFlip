@@ -63,8 +63,10 @@ jobs:
 
       - name: Generate assets (SVG -> PNG)
         run: |
-          # Generate PNG assets used by the Android build
-          python assets/generate_assets.py || true
+          python assets/generate_assets.py
+          test -f assets/logo.png
+          test -f assets/icon_foreground.png
+          test -f assets/logo_background.png
 
       - name: Build Release APK with Buildozer
         env:
