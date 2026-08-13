@@ -15,7 +15,7 @@ Window.softinput_mode = 'below_target'
 class TypoFlipApp(App):
     def build(self):
         self.title = "TypoFlip - Layout Converter"
-        self.converter = LayoutConverterEngine()
+        self.converter = LayoutConverterEngine()  # Assuming LayoutConverterEngine is defined elsewhere
 
         # Top padding dp(54) provides clean clearance below status bar/camera notch
         layout = BoxLayout(
@@ -54,3 +54,11 @@ class TypoFlipApp(App):
         self.output_field.text = ""
         if self.copy_btn.text != "Copy to Clipboard":
             self.copy_btn.text = "Copy to Clipboard"
+
+# Assuming LayoutConverterEngine is defined elsewhere
+class LayoutConverterEngine:
+    pass
+
+def get_status_bar_height():
+    # Placeholder function for getting status bar height
+    return dp(54)
