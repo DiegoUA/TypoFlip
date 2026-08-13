@@ -20,7 +20,7 @@ class TypoFlipApp(App):
         # Top padding dp(54) provides clean clearance below status bar/camera notch
         layout = BoxLayout(
             orientation='vertical',
-            padding=[dp(12), 0, dp(12), dp(12)],
+            padding=[dp(12), get_status_bar_height(), dp(12), dp(12)],
             spacing=dp(10)
         )
 
