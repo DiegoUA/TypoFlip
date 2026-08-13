@@ -3,8 +3,14 @@
 # (str) Title of your application
 title = TypoFlip
 
-# (str) Icon of the application (remains full resolution for app launcher)
-icon.filename = %(source.dir)s/assets/icon_foreground.png
+# (str) Icon of the application. Use a full square launcher icon so the app drawer matches standard Android icon styling.
+icon.filename = %(source.dir)s/assets/logo.png
+icon.background_color = #2C2C2E
+
+# Adaptive Android icon support
+android.adaptiveicon.foreground.filename = %(source.dir)s/assets/icon_foreground.png
+android.adaptiveicon.background.filename = %(source.dir)s/assets/logo.png
+android.adaptiveicon.background_color = #2C2C2E
 
 # (str) Presplash of the application (uses centered rounded logo with padding)
 presplash.filename = %(source.dir)s/assets/presplash.png

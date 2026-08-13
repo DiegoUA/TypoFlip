@@ -8,39 +8,40 @@ TypoFlip
 ---
 
 ## 2. Short Description (80 characters max)
-Privacy-first layout converter, password generator, and text utility.
+Privacy-first Android layout converter, password generator, and text utility.
 
 ---
 
 ## 3. Full Description (4,000 characters max)
 
-TypoFlip is a fast, lightweight, and privacy-first text utility designed to streamline your daily workflow without compromising your privacy. 
+TypoFlip is a fast, lightweight, and privacy-first text utility built for modern Android users who want a clean, native-feeling workflow without sacrificing trust or performance.
 
-Have you ever typed an entire sentence only to realize your keyboard was set to the wrong language or layout? Or needed a strong password generated without sending sensitive data to cloud servers? TypoFlip solves these problems instantly—100% locally on your device.
+Have you ever typed a full sentence only to realize the keyboard layout was wrong? Need to generate a strong password without sending anything to the cloud? TypoFlip solves both instantly — all processing happens locally on your device.
 
 ### 🌟 Key Features
 
-🔤 Instant Keyboard Layout Converter
+🔤 Instant Keyboard Layout Conversion
 • Convert mis-typed text between keyboard layouts with a single tap.
-• Quick case manipulation: UPPERCASE, lowercase, Title Case, camelCase, and alternating text.
+• Clean, responsive editor that adapts to modern phones and the Android keyboard.
+• Designed to stay readable and usable even when the system keyboard is open.
 
-🔑 Local Secure Password Generator
-• Generate high-entropy, customizable passwords on demand.
-• Adjust password length, toggle special characters, numbers, and capital letters.
-• Zero telemetry, zero logging, and zero network transmission.
+🔑 Local Secure Password Generation
+• Generate strong, high-entropy passwords on demand.
+• Customize length and character rules without sending data anywhere.
+• Zero telemetry, zero analytics, and zero online dependency.
 
-📊 Essential Text Utilities & Analytics
-• Real-time character, word, line, and space counts.
-• Remove duplicate spaces, clean up unwanted line breaks, and trim formatting.
-• One-tap clipboard integration for fast copying and pasting.
+📱 Android-Native Experience
+• Material-inspired styling with rounded surfaces and balanced controls.
+• Flexible input and output panels optimized for different screen sizes.
+• System-aware resizing to keep the app comfortable on phones with varied safe-area layouts.
 
 🔒 100% Private & Offline by Design
-• Zero Internet Permissions required: TypoFlip does not ask for or use network access.
-• No Ads, no tracking, no analytics, and no third-party SDKs.
-• All text processing happens strictly within your phone's memory.
+• No internet permissions required.
+• No ads, no tracking, no analytics, and no third-party SDKs.
+• Text conversion, password generation, and clipboard actions stay entirely on-device.
 
 🌐 Transparent & Open Source
-TypoFlip is fully open-source and licensed under GPLv3. You can inspect the source code and verify our security practices anytime on GitHub:
+TypoFlip is fully open-source and licensed under the GNU GPLv3. You can inspect the source code and verify our practices anytime on GitHub:
 https://github.com/DiegoUA/TypoFlip
 
 ---
@@ -48,7 +49,7 @@ https://github.com/DiegoUA/TypoFlip
 ## 4. Categorization & Setup Metadata
 
 • Application Type: App
-• Category: Tools (or Productivity)
+• Category: Tools / Productivity
 • Contains Ads: No
 • In-App Purchases: No
 • Content Rating: Everyone / 3+

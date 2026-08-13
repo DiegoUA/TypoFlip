@@ -1,6 +1,6 @@
 # Privacy Policy for TypoFlip
 
-**Effective Date:** August 8, 2026
+**Effective Date:** August 14, 2026
 
 ## Overview
 TypoFlip ("the Application") is an open-source layout converter, password generator, and text utility designed with a **privacy-first** philosophy. This Privacy Policy outlines our data practices for the Application.
@@ -13,23 +13,23 @@ TypoFlip ("the Application") is an open-source layout converter, password genera
 TypoFlip does **not** collect, store, transmit, or share any personal information, user identifiers, device metadata, or usage analytics.
 
 ### 2. On-Device Local Processing
-All functions—including text layout conversion, password generation, and clipboard operations—are executed **100% locally on your device**. None of your inputs, generated passwords, or converted text leave your local hardware environment.
+All functions—including keyboard layout conversion, password generation, clipboard operations, and live text transforms—are executed **100% locally on your device**. None of your inputs, generated passwords, or converted text leave your local hardware environment.
 
 ### 3. Zero Network Communication
 The Application does not require internet access, host any remote backend servers, or integrate third-party advertising, tracking, or telemetry SDKs.
 
 ### 4. Clipboard Operations
-When you utilize the copy-to-clipboard features, text is passed solely to your operating system's native clipboard manager for your direct usage.
+When you use the copy-to-clipboard feature, text is passed only to your operating system's native clipboard manager for direct use by you.
 
 ---
 
 ## Third-Party Services
-The Application does not utilize any third-party analytics services, advertisement networks, or external tracking tools.
+The Application does not use any third-party analytics services, advertising networks, or external tracking tools.
 
 ---
 
 ## Children's Privacy
-Because TypoFlip does not collect any personal data whatsoever, the Application is fully compliant with global privacy standards, including the Children’s Online Privacy Protection Act (COPPA) and General Data Protection Regulation (GDPR).
+Because TypoFlip does not collect any personal data whatsoever, the Application is compatible with global privacy expectations, including the Children’s Online Privacy Protection Act (COPPA) and the General Data Protection Regulation (GDPR).
 
 ---
 
@@ -40,7 +40,7 @@ TypoFlip is transparent and open-source. Users and security researchers can revi
 ---
 
 ## Changes to This Privacy Policy
-We may update our Privacy Policy from time to time. Any changes will be posted directly to this document with an updated effective date.
+We may update this Privacy Policy from time to time. Any changes will be posted directly to this document with an updated effective date.
 
 ---
 
