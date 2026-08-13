@@ -8,9 +8,6 @@ from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.core.window import Window
 
-from engines.layout_converter import LayoutConverterEngine
-from jnius import autoclass  # Import autoclass from jnius to resolve the undefined name error
-
 # Configure Kivy window to resize layout above Android soft keyboard
 Window.softinput_mode = 'below_target'
 
@@ -23,7 +20,7 @@ class TypoFlipApp(App):
         # Top padding dp(54) provides clean clearance below status bar/camera notch
         layout = BoxLayout(
             orientation='vertical',
-            padding=[dp(12), get_status_bar_height(), dp(12), dp(12)],
+            padding=[dp(12), 0, dp(12), dp(12)],
             spacing=dp(10)
         )
 
