@@ -20,6 +20,7 @@ TypoFlip/
 │   ├── feature_graphic.png    # Store feature banner graphic
 │   ├── feature_graphic.svg    # Store feature banner vector source
 │   ├── generate_assets.py     # Local SVG -> PNG asset renderer (PyMuPDF & Pillow)
+│   ├── icon_foreground.png    # Adaptive icon foreground asset for Android builds
 │   ├── logo.png               # Primary app icon
 │   ├── logo.svg               # Vector app logo source
 │   └── presplash.png          # Centered rounded logo for Android splash screen

@@ -42,8 +42,8 @@ def create_adaptive_foreground(svg_path, png_path, dpi=150):
     doc = fitz.open(svg_path)
     page = doc[0]
     
-    pix = page.get_pixmap(dpi=dpi)
-    pix.save(png_path, transparent=True)
+    pix = page.get_pixmap(dpi=dpi, alpha=True)
+    pix.save(png_path)
     print(f"✓ Generated: {png_path} ({pix.width}x{pix.height} px)")
 
 if __name__ == "__main__":
