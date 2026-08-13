@@ -4,7 +4,7 @@
 title = TypoFlip
 
 # (str) Icon of the application (remains full resolution for app launcher)
-icon.filename = %(source.dir)s/assets/logo.png
+icon.filename = %(source.dir)s/assets/icon_foreground.png
 
 # (str) Presplash of the application (uses centered rounded logo with padding)
 presplash.filename = %(source.dir)s/assets/presplash.png

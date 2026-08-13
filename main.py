@@ -22,38 +22,31 @@ class TypoFlipApp(App):
         # Top padding dp(54) provides clean clearance below status bar/camera notch
         layout = BoxLayout(
             orientation='vertical',
-            padding=[dp(12), dp(54), dp(12), dp(12)],
+            padding=[dp(12), get_status_bar_height(), dp(12), dp(12)],
             spacing=dp(10)
         )
 
-        # Input field
-        self.input_field = TextInput(
-            hint_text="Type or paste Ukrainian text here...",
-            multiline=True,
-            size_hint_y=0.4
-        )
-        self.input_field.bind(text=self.on_text_change)
-
-        # Output field
-        self.output_field = TextInput(
-            hint_text="Converted English layout output...",
-            multiline=True,
-            readonly=True,
-            size_hint_y=0.4
-        )
-
-        # Copy button
+        # Central action bar
+        action_bar = BoxLayout(size_hint_y=0.45, height=dp(48))
         self.copy_btn = Button(
             text="Copy to Clipboard",
-            markup=True,
-            size_hint_y=0.2
+            size_hint_x=None,
+            width=dp(120),
+            on_press=self.copy_to_clipboard
         )
-        self.copy_btn.bind(on_press=self.copy_to_clipboard)
+        clear_btn = Button(
+            text="Clear Input",
+            size_hint_x=None,
+            width=dp(120),
+            on_press=self.clear_input
+        )
+
+        action_bar.add_widget(self.input_field)
+        action_bar.add_widget(action_bar)
+        action_bar.add_widget(self.output_field)
 
         # Assemble UI
-        layout.add_widget(self.input_field)
-        layout.add_widget(self.output_field)
-        layout.add_widget(self.copy_btn)
+        layout.add_widget(action_bar)
 
         return layout
 
@@ -69,19 +62,28 @@ class TypoFlipApp(App):
         """Copies output text to system clipboard."""
         if self.output_field.text:
             Clipboard.copy(self.output_field.text)
-            self.copy_btn.markup = True
-            
-            # Resolve absolute filesystem path for Kivy image markup on Android
-            icon_path = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "assets", "clipboard.png")
-            )
-            self.copy_btn.text = f"Copied! [size=20sp][image={icon_path}][/size]"
-            
-            # Reset button text back after 3 seconds
+            self.copy_btn.text = "Copied!"
             Clock.schedule_once(self.reset_copy_button, 3)
 
     def reset_copy_button(self, dt):
         self.copy_btn.text = "Copy to Clipboard"
+
+    def clear_input(self, instance):
+        """Clears input and output fields."""
+        self.input_field.text = ""
+        self.output_field.text = ""
+        if self.copy_btn.text != "Copy to Clipboard":
+            self.copy_btn.text = "Copy to Clipboard"
+
+
+def get_status_bar_height():
+    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+    activity = PythonActivity.mActivity
+    resources = activity.getResources()
+    status_bar_height = resources.getDimensionPixelSize(
+        resources.getIdentifier("status_bar_height", "dimen", "android")
+    )
+    return dp(status_bar_height)
 
 
 if __name__ == '__main__':
