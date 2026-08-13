@@ -51,41 +51,9 @@ class TypoFlipApp(App):
 
         return layout
 
-    def on_text_change(self, instance, text_value):
-        """Triggers live conversion using the layout engine."""
-        converted_text = self.converter.convert(text_value, mode="UKR_TO_ENG")
-        self.output_field.text = converted_text
-
-        if self.copy_btn.text != "Copy to Clipboard":
-            self.copy_btn.text = "Copy to Clipboard"
-
-    def copy_to_clipboard(self, instance):
-        """Copies output text to system clipboard."""
-        if self.output_field.text:
-            Clipboard.copy(self.output_field.text)
-            self.copy_btn.text = "Copied!"
-            Clock.schedule_once(self.reset_copy_button, 3)
-
-    def reset_copy_button(self, dt):
-        self.copy_btn.text = "Copy to Clipboard"
-
     def clear_input(self, instance):
         """Clears input and output fields."""
         self.input_field.text = ""
         self.output_field.text = ""
         if self.copy_btn.text != "Copy to Clipboard":
             self.copy_btn.text = "Copy to Clipboard"
-
-
-def get_status_bar_height():
-    PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    activity = PythonActivity.mActivity
-    resources = activity.getResources()
-    status_bar_height = resources.getDimensionPixelSize(
-        resources.getIdentifier("status_bar_height", "dimen", "android")
-    )
-    return dp(status_bar_height)
-
-
-if __name__ == '__main__':
-    TypoFlipApp().run()
