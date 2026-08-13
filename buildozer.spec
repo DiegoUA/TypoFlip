@@ -28,7 +28,7 @@ source.include_exts = py,png,jpg,kv,atlas,json,txt
 version = 0.1
 
 # (list) Application requirements
-requirements = python3,kivy
+requirements = python3==3.11.0,kivy
 
 # (str) Supported orientation
 orientation = portrait
@@ -41,7 +41,7 @@ fullscreen = 0
 #
 
 # (list) Permissions required by your application
-android.permissions = 
+android.permissions =
 
 # (int) Target Android API (API 36 for Android 16 compliance)
 android.api = 36
