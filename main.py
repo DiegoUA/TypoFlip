@@ -9,6 +9,7 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 
 from engines.layout_converter import LayoutConverterEngine
+from jnius import autoclass  # Import autoclass from jnius to resolve the undefined name error
 
 # Configure Kivy window to resize layout above Android soft keyboard
 Window.softinput_mode = 'below_target'
