@@ -5,6 +5,7 @@ from kivy.core.clipboard import Clipboard
 from kivy.clock import Clock
 from kivy.metrics import dp
 from kivy.core.window import Window
+from kivy.utils import platform as kivy_platform
 
 from engines.layout_converter import LayoutConverterEngine
 from theme import MaterialButton, MaterialTextInput, MaterialTheme, ThemeManager
@@ -15,15 +16,48 @@ Window.softinput_mode = 'resize'
 Window.clearcolor = MaterialTheme.background()
 
 
+def get_status_bar_height(default_dp: float = 12.0):
+    """Return status bar height in dp on Android, else return a sane default.
+
+    This uses pyjnius only when running on Android. On desktop and CI the
+    function returns default_dp (in dp units) so tests and local runs are
+    unaffected.
+    """
+    from kivy.metrics import dp
+
+    if kivy_platform != 'android':
+        return dp(default_dp)
+
+    try:
+        # Import jnius lazily to avoid import-time failures on non-Android
+        from jnius import autoclass
+
+        PythonActivity = autoclass('org.kivy.android.PythonActivity')
+        activity = PythonActivity.mActivity
+        res = activity.getResources()
+        resource_id = res.getIdentifier('status_bar_height', 'dimen', 'android')
+        if resource_id > 0:
+            status_bar_px = res.getDimensionPixelSize(resource_id)
+            # convert px to dp: dp = px / density
+            metrics = activity.getResources().getDisplayMetrics()
+            density = metrics.density
+            return status_bar_px / density
+    except Exception:
+        # Fall back to a small top padding if anything goes wrong
+        return dp(default_dp)
+
+
+
 class TypoFlipApp(App):
     def build(self):
         self.title = 'TypoFlip - Layout Converter'
         self.converter = LayoutConverterEngine()
 
         theme = MaterialTheme.current()
+        top_padding = get_status_bar_height(default_dp=12)
         root = BoxLayout(
             orientation='vertical',
-            padding=[dp(12), dp(12), dp(12), dp(12)],
+            padding=[dp(12), top_padding, dp(12), dp(12)],
             spacing=theme.spacing,
             size_hint=(1, 1),
         )
