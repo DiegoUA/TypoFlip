@@ -16,6 +16,7 @@ class Palette:
     surface_muted: tuple
     text: tuple
     text_on_surface: tuple
+    hint_text: tuple
     shadow: tuple
     button_radius: float
     field_radius: float
@@ -34,6 +35,7 @@ DARK_PALETTE = Palette(
     surface_muted=(0.42, 0.42, 0.45, 1.0),
     text=(0.94, 0.94, 0.96, 1.0),
     text_on_surface=(0.99, 0.99, 0.99, 1.0),
+    hint_text=(0.68, 0.68, 0.73, 1.0),
     shadow=(0.0, 0.0, 0.0, 0.24),
     button_radius=dp(16),
     field_radius=dp(18),
@@ -52,6 +54,7 @@ LIGHT_PALETTE = Palette(
     surface_muted=(0.82, 0.82, 0.85, 1.0),
     text=(0.10, 0.10, 0.12, 1.0),
     text_on_surface=(0.10, 0.10, 0.12, 1.0),
+    hint_text=(0.44, 0.44, 0.48, 1.0),
     shadow=(0.0, 0.0, 0.0, 0.12),
     button_radius=dp(16),
     field_radius=dp(16),
@@ -109,6 +112,10 @@ class MaterialTheme:
         return MaterialTheme.current().text_on_surface
 
     @staticmethod
+    def hint_text():
+        return MaterialTheme.current().hint_text
+
+    @staticmethod
     def shadow():
         return MaterialTheme.current().shadow
 
@@ -153,9 +160,10 @@ class MaterialButton(Button):
         self.background_down = ''
         self.background_color = (0, 0, 0, 0)
         self.border = (0, 0, 0, 0)
-        self.text_size = self.size
         self.halign = 'center'
         self.valign = 'middle'
+        self.shorten = True
+        self.shorten_from = 'right'
         self._shadow_color = None
         self._shadow_rect = None
         self._fill_color = None
@@ -164,6 +172,14 @@ class MaterialButton(Button):
         self._update_canvas()
 
     def _update_canvas(self, *args):
+        # text_size MUST be recalculated on every resize, not just once in
+        # __init__. Widgets start out at Kivy's tiny default size (100x100)
+        # before the layout pass gives them their real size, so setting
+        # text_size a single time at construction locks the label wrapping
+        # to that stale size -- that's what was cropping/mis-wrapping the
+        # button text ("Copy to Clipboard" -> "Cli" / "Cle ar").
+        h_padding = dp(12)
+        self.text_size = (max(self.width - h_padding * 2, 0), self.height)
         if self._fill_color is None:
             with self.canvas.before:
                 self._shadow_color = Color(*MaterialTheme.shadow())
@@ -201,6 +217,15 @@ class MaterialTextInput(TextInput):
         self.background_color = (0, 0, 0, 0)
         self.border = (0, 0, 0, 0)
         self.padding = MaterialTheme.field_padding()
+        # Explicitly set every text-color property instead of relying on
+        # Kivy's built-in defaults. The hint text in particular was never
+        # given a color here, so it fell back to a default that has no
+        # guaranteed contrast against our custom-drawn dark surface --
+        # that's the "dark text on dark background" bug.
+        if 'hint_text_color' not in kwargs:
+            self.hint_text_color = MaterialTheme.hint_text()
+        if 'disabled_foreground_color' not in kwargs:
+            self.disabled_foreground_color = MaterialTheme.hint_text()
         self._fill_color = None
         self._fill_rect = None
         self.bind(size=self._update_canvas, pos=self._update_canvas)

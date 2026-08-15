@@ -16,35 +16,70 @@ Window.softinput_mode = 'resize'
 Window.clearcolor = MaterialTheme.background()
 
 
-def get_status_bar_height(default_dp: float = 12.0):
-    """Return status bar height in dp on Android, else return a sane default.
+def register_android_insets_listener(on_insets_changed):
+    """Attach a live WindowInsets listener on Android so the app can react
+    to the *current* system bar sizes (status bar + navigation/gesture bar)
+    and to changes in them (rotation, 3-button vs. gesture nav, foldables,
+    etc.), instead of reading a static dimension once at startup.
 
-    This uses pyjnius only when running on Android. On desktop and CI the
-    function returns default_dp (in dp units) so tests and local runs are
-    unaffected.
+    Android 15+ (which this app targets via android.api = 36) enforces
+    edge-to-edge rendering: the app's window is always drawn full-screen
+    behind the system bars, whether we ask for it or not. A one-time
+    "status_bar_height" dimen lookup with a small hardcoded fallback (the
+    old approach) can't account for that, and never updates -- which is
+    why content was drawn under the clock/notch and, depending on device,
+    under the gesture bar too.
+
+    `on_insets_changed(top_px, bottom_px)` is called on the Kivy thread
+    every time the system reports the current inset sizes, in real
+    (unscaled) pixels -- Kivy's own coordinate space on Android already
+    matches physical pixels, so these values can be used directly as
+    widget padding without any dp conversion.
+
+    Uses the plain Android framework View.OnApplyWindowInsetsListener
+    (API 21+) with the legacy getSystemWindowInsetTop/Bottom() accessors
+    (API 20+, deprecated but still fully functional) rather than the
+    AndroidX Insets APIs, so this works without adding an extra AndroidX
+    Gradle dependency to the Buildozer/p4a build.
     """
-    from kivy.metrics import dp
-
     if kivy_platform != 'android':
-        return dp(default_dp)
+        return
 
     try:
-        # Import jnius lazily to avoid import-time failures on non-Android
-        from jnius import autoclass
+        from jnius import autoclass, PythonJavaClass, java_method
 
         PythonActivity = autoclass('org.kivy.android.PythonActivity')
         activity = PythonActivity.mActivity
-        res = activity.getResources()
-        resource_id = res.getIdentifier('status_bar_height', 'dimen', 'android')
-        if resource_id > 0:
-            status_bar_px = res.getDimensionPixelSize(resource_id)
-            # convert px to dp: dp = px / density
-            metrics = activity.getResources().getDisplayMetrics()
-            density = metrics.density
-            return status_bar_px / density
+        window = activity.getWindow()
+        decor_view = window.getDecorView()
+
+        class _InsetsListener(PythonJavaClass):
+            __javainterfaces__ = ['android/view/View$OnApplyWindowInsetsListener']
+            __javacontext__ = 'app'
+
+            @java_method(
+                '(Landroid/view/View;Landroid/view/WindowInsets;)'
+                'Landroid/view/WindowInsets;'
+            )
+            def onApplyWindowInsets(self, view, insets):
+                top_px = insets.getSystemWindowInsetTop()
+                bottom_px = insets.getSystemWindowInsetBottom()
+                Clock.schedule_once(
+                    lambda dt: on_insets_changed(top_px, bottom_px)
+                )
+                return insets
+
+        listener = _InsetsListener()
+        decor_view.setOnApplyWindowInsetsListener(listener)
+        # Keep a strong reference on the activity -- pyjnius listener
+        # objects get garbage-collected (and silently stop firing) if
+        # nothing on the Java side holds onto them.
+        activity._typoflip_insets_listener = listener
+        decor_view.requestApplyInsets()
     except Exception:
-        # Fall back to a small top padding if anything goes wrong
-        return dp(default_dp)
+        # Never let a missing API / OEM quirk crash startup; the app just
+        # keeps its default padding in that case.
+        pass
 
 
 
@@ -54,13 +89,14 @@ class TypoFlipApp(App):
         self.converter = LayoutConverterEngine()
 
         theme = MaterialTheme.current()
-        top_padding = get_status_bar_height(default_dp=12)
+        self.base_padding = [dp(12), dp(12), dp(12), dp(12)]
         root = BoxLayout(
             orientation='vertical',
-            padding=[dp(12), top_padding, dp(12), dp(12)],
+            padding=list(self.base_padding),
             spacing=theme.spacing,
             size_hint=(1, 1),
         )
+        self.root_layout = root
 
         self.input_field = MaterialTextInput(
             multiline=True,
@@ -68,6 +104,7 @@ class TypoFlipApp(App):
             hint_text='Enter or paste text here',
             font_size=theme.input_font_size,
             foreground_color=theme.text,
+            hint_text_color=theme.hint_text,
             cursor_color=theme.text,
             background_color=(0, 0, 0, 0),
             fill_color=theme.surface,
@@ -115,7 +152,18 @@ class TypoFlipApp(App):
         root.add_widget(action_bar)
         root.add_widget(self.output_field)
 
+        register_android_insets_listener(self._apply_system_insets)
+
         return root
+
+    def _apply_system_insets(self, top_px, bottom_px):
+        left, _old_top, right, _old_bottom = self.base_padding
+        self.root_layout.padding = [
+            left,
+            max(left, top_px),
+            right,
+            max(right, bottom_px),
+        ]
 
     def _on_text_changed(self, instance, value):
         try:
