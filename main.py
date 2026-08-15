@@ -7,6 +7,8 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 from kivy.utils import platform as kivy_platform
 
+from kivy.logger import Logger
+
 from engines.layout_converter import LayoutConverterEngine
 from theme import MaterialButton, MaterialTextInput, MaterialTheme, ThemeManager
 
@@ -16,70 +18,67 @@ Window.softinput_mode = 'resize'
 Window.clearcolor = MaterialTheme.background()
 
 
-def register_android_insets_listener(on_insets_changed):
-    """Attach a live WindowInsets listener on Android so the app can react
-    to the *current* system bar sizes (status bar + navigation/gesture bar)
-    and to changes in them (rotation, 3-button vs. gesture nav, foldables,
-    etc.), instead of reading a static dimension once at startup.
+class AndroidInsetsWatcher:
+    """Polls the current system-bar insets (status bar + navigation/gesture
+    bar) from Kivy's own thread and forwards changes to a callback.
 
-    Android 15+ (which this app targets via android.api = 36) enforces
-    edge-to-edge rendering: the app's window is always drawn full-screen
-    behind the system bars, whether we ask for it or not. A one-time
-    "status_bar_height" dimen lookup with a small hardcoded fallback (the
-    old approach) can't account for that, and never updates -- which is
-    why content was drawn under the clock/notch and, depending on device,
-    under the gesture bar too.
+    This deliberately does NOT implement a Java
+    View.OnApplyWindowInsetsListener via pyjnius' PythonJavaClass. That
+    pattern registers a callback that Android invokes on the Activity's own
+    UI thread -- which is a *different* thread than the one running Kivy's
+    SDL2 game loop on Android. A JNI up-call landing in the Python
+    interpreter from that foreign thread, especially in the middle of a
+    touch-driven layout pass (e.g. exactly when the on-screen keyboard
+    opens after tapping a text field), is a known source of hard crashes
+    in Kivy/python-for-android apps -- which is what was happening here.
 
-    `on_insets_changed(top_px, bottom_px)` is called on the Kivy thread
-    every time the system reports the current inset sizes, in real
-    (unscaled) pixels -- Kivy's own coordinate space on Android already
-    matches physical pixels, so these values can be used directly as
-    widget padding without any dp conversion.
-
-    Uses the plain Android framework View.OnApplyWindowInsetsListener
-    (API 21+) with the legacy getSystemWindowInsetTop/Bottom() accessors
-    (API 20+, deprecated but still fully functional) rather than the
-    AndroidX Insets APIs, so this works without adding an extra AndroidX
-    Gradle dependency to the Buildozer/p4a build.
+    Polling sidesteps that class of bug entirely: every read happens on
+    Kivy's own thread via Clock.schedule_interval, so there is no foreign
+    -thread callback into the interpreter at all, only a plain getter call.
     """
-    if kivy_platform != 'android':
-        return
 
-    try:
-        from jnius import autoclass, PythonJavaClass, java_method
+    POLL_INTERVAL = 0.2
 
-        PythonActivity = autoclass('org.kivy.android.PythonActivity')
-        activity = PythonActivity.mActivity
-        window = activity.getWindow()
-        decor_view = window.getDecorView()
+    def __init__(self, on_change):
+        self._on_change = on_change
+        self._last = (None, None)
+        self._decor_view = None
 
-        class _InsetsListener(PythonJavaClass):
-            __javainterfaces__ = ['android/view/View$OnApplyWindowInsetsListener']
-            __javacontext__ = 'app'
+    def start(self):
+        if kivy_platform != 'android':
+            return
+        try:
+            from jnius import autoclass
 
-            @java_method(
-                '(Landroid/view/View;Landroid/view/WindowInsets;)'
-                'Landroid/view/WindowInsets;'
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            activity = PythonActivity.mActivity
+            self._decor_view = activity.getWindow().getDecorView()
+        except Exception:
+            Logger.exception(
+                'TypoFlip: could not obtain the Android decor view; '
+                'system-bar padding will stay at its default fallback.'
             )
-            def onApplyWindowInsets(self, view, insets):
-                top_px = insets.getSystemWindowInsetTop()
-                bottom_px = insets.getSystemWindowInsetBottom()
-                Clock.schedule_once(
-                    lambda dt: on_insets_changed(top_px, bottom_px)
-                )
-                return insets
+            return
 
-        listener = _InsetsListener()
-        decor_view.setOnApplyWindowInsetsListener(listener)
-        # Keep a strong reference on the activity -- pyjnius listener
-        # objects get garbage-collected (and silently stop firing) if
-        # nothing on the Java side holds onto them.
-        activity._typoflip_insets_listener = listener
-        decor_view.requestApplyInsets()
-    except Exception:
-        # Never let a missing API / OEM quirk crash startup; the app just
-        # keeps its default padding in that case.
-        pass
+        # Poll continuously: insets change on rotation, when the gesture/
+        # 3-button nav bar toggles, and when the keyboard opens/closes.
+        Clock.schedule_interval(self._poll, self.POLL_INTERVAL)
+        self._poll(0)  # run once immediately so the first frame is correct
+
+    def _poll(self, dt):
+        try:
+            insets = self._decor_view.getRootWindowInsets()
+            if insets is None:
+                return  # not laid out yet -- try again next tick
+            top_px = insets.getSystemWindowInsetTop()
+            bottom_px = insets.getSystemWindowInsetBottom()
+        except Exception:
+            Logger.exception('TypoFlip: failed to read window insets')
+            return
+
+        if (top_px, bottom_px) != self._last:
+            self._last = (top_px, bottom_px)
+            self._on_change(top_px, bottom_px)
 
 
 
@@ -152,7 +151,8 @@ class TypoFlipApp(App):
         root.add_widget(action_bar)
         root.add_widget(self.output_field)
 
-        register_android_insets_listener(self._apply_system_insets)
+        self._insets_watcher = AndroidInsetsWatcher(self._apply_system_insets)
+        self._insets_watcher.start()
 
         return root
 
